@@ -34,11 +34,11 @@ static void on_mouse( int event, int x, int y, int flags, void* param )
 int main()
 {
 	//string filename = "F:\\Data\\Ls_Data\\00\\0050.bmp";
-	string filename = "test.jpg";
+	string filename = "test1.jpg";
 	Mat image = imread( filename, 1 );
 	Size s;
-	s.height = image.rows / 5;
-	s.width = image.cols / 5;
+	s.height = image.rows / 2;
+	s.width = image.cols / 2;
 	resize(image, image, s);
 	if( image.empty() )
 	{
@@ -67,6 +67,9 @@ int main()
 			cout << endl;
 			gcapp.reset();
 			gcapp.showImage();
+			break;
+		case 'b':
+			gcapp.borderMatting();
 			break;
 		case 'n':
 			int iterCount = gcapp.getIterCount();

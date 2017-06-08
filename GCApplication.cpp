@@ -1,3 +1,4 @@
+#include <vector>
 #include "GCApplication.h"
 
 //Set value for the class
@@ -25,9 +26,12 @@ void GCApplication::setImageAndWinName( const Mat& _image, const string& _winNam
 	mask.create( image->size(), CV_8UC1);
 	reset();
 }
-
+//Show image with border matting
+void GCApplication::borderMatting() {
+	bm.borderMatting(*image, mask, alphaMask);
+}
 //Show the result image
-void GCApplication::showImage() const
+void GCApplication::showImage()
 {
 	if( image->empty() || winName->empty() )
 		return;
@@ -41,7 +45,7 @@ void GCApplication::showImage() const
 		getBinMask( mask, binMask );
 		image->copyTo( res, binMask );  //show the GrabCuted image
 	}
-
+	imwrite("result.jpg", res);
 	vector<Point>::const_iterator it;
 	//Using four different colors show the point which have been selected
 	for( it = bgdPxls.begin(); it != bgdPxls.end(); ++it )  
