@@ -2,6 +2,68 @@
 #include <vector>
 using namespace std;
 using namespace cv;
+
+//高斯概率模型，主要用于 BorderMatting 过程中
+Gauss::Gauss() {
+	//初始值都设置为0
+	mean = Vec3f(0, 0, 0);
+	covmat.create(3, 3, CV_64FC1);
+	covmat.setTo(0);
+}
+//计算高斯概率。
+double Gauss::gauss(const double _u, const double _sigma, const double _x) {
+	double t = (-0.5)*(_x - _u)*(_x - _u) / (_sigma*_sigma);
+	return 1.0f / _sigma*exp(t);
+	if (_x>_u) return 1;
+	else {
+		double t = (-0.5)*(_x - _u)*(_x - _u) / (_sigma*_sigma);
+		return 1.0f / _sigma*exp(t);
+	}
+}
+//向高斯模型中加入一个样例
+void Gauss::addsample(Vec3f _color) {
+	samples.push_back(_color);
+}
+//根据样例模型，计算高斯模型中的均值和协方差
+void Gauss::learn() {
+	//计算均值
+	Vec3f sum = 0;
+	int sz = (int)samples.size();
+	for (int i = 0; i < sz; i++) sum += samples[i];
+	mean = sum / sz;
+	//计算协方差
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			double sum = 0;
+			for (int cnt = 0; cnt < sz; cnt++) sum += (samples[cnt][i] - mean[i])*(samples[cnt][j] - mean[j]);
+			covmat.at<double>(i, j) = sum / sz;
+		}
+	}
+}
+//计算高斯模型的概率
+double Gauss::possibility(const Vec3f &_mean, const cv::Mat &_covmat, Vec3f _color) {
+	double mul = 0;
+	Mat diff(1, 3, CV_64FC1);
+	Mat ans(1, 1, CV_64FC1);
+	diff.at<double>(0, 0) = _color[0] - _mean[0];
+	diff.at<double>(0, 1) = _color[1] - _mean[1];
+	diff.at<double>(0, 2) = _color[2] - _mean[2];
+	ans = diff * _covmat.inv() * diff.t();
+	mul = (-0.5)*ans.at<double>(0, 0);
+	return 1.0f / sqrt(determinant(_covmat))*exp(mul);
+}
+//对两个参数进行离散化处理
+void Gauss::discret(vector<double> &_sigma, vector<double> &_delta) {
+	_sigma.clear();
+	_delta.clear();
+	for (double i = 0.1; i <= 6; i += (6.0 / 30)) {
+		_delta.push_back(i);
+	}
+	for (double i = 0.1; i <= 2; i += (2.0 / 10)) {
+		_sigma.push_back(i);
+	}
+}
+
 //GMM的构造函数，从 model 中读取参数并存储
 GMM::GMM(Mat& _model) {
 	//GMM模型有13*K项数据，一个权重，三个均值和九个协方差

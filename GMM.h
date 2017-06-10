@@ -3,8 +3,35 @@
 #include <opencv2\opencv.hpp>
 #include <opencv2\highgui\highgui.hpp>
 #include <opencv2\core\core.hpp>
-class GMM
-{
+//高斯概率模型，主要用于 BorderMatting 过程中
+class Gauss {
+public:
+	//高斯模型的构造函数
+	Gauss();
+	//计算高斯概率。
+	static double gauss(const double, const double, const double);
+	//计算高斯模型的概率(另外一种方式）
+	static double possibility(const cv::Vec3f&, const cv::Mat&, cv::Vec3f);
+	//对两个参数进行离散化处理
+	static void discret(std::vector<double>&, std::vector<double>&);//delta range from [0,6], sigma range from [0,delta/3]
+	//向高斯模型中加入一个样例
+	void addsample(cv::Vec3f);
+	//根据样例模型，计算高斯模型中的均值和协方差
+	void learn();
+	cv::Vec3f getmean()const { return mean; }
+	cv::Mat getcovmat()const { return covmat; }
+private:
+	//高斯模型的均值
+	cv::Vec3f mean;
+	//高斯模型的协方差
+	cv::Mat covmat;
+	//样例集合
+	std::vector<cv::Vec3f> samples;
+	
+};
+
+
+class GMM {
 public:
 	//高斯模型的数量，按照论文中的实现，为5
 	static const int K = 5;

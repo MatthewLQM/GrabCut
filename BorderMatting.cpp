@@ -119,8 +119,7 @@ inline double ufunc(double _a, double _uf, double _ub){
 	return (1.0 - _a)*_ub + _a*_uf;
 }
 //论文中公式15（2）
-inline double cfunc(double _a, double _cf, double _cb)
-{
+inline double cfunc(double _a, double _cf, double _cb){
 	return pow(1.0 - _a, 2.0)*_cb + pow(_a, 2.0)*_cf;
 }
 //sigmoid函数,当做soft step-function（论文图6.c)
@@ -348,7 +347,7 @@ void BorderMatting::display(const Mat& _originImage, const Mat& _alphaMask){
 	imshow("img", res);
 }
 //borderMatting的构造函数，也是其对外提供的接口。
-void BorderMatting::borderMatting(const Mat& _originImage, const Mat& _mask, Mat& _alphaMask){
+void BorderMatting::borderMatting(const Mat& _originImage, const Mat& _mask, Mat& _alphaMask) {
 	//初始化参数
 	init(_originImage);
 	//进行轮廓检测

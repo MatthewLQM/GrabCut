@@ -77,13 +77,10 @@ static void calcuNWeight(const Mat& _img, Mat& _l, Mat& _ul, Mat& _u, Mat& _ur, 
 static void initMaskWithRect(Mat& _mask, Size _imgSize, Rect _rect) {
 	_mask.create(_imgSize, CV_8UC1);
 	_mask.setTo(MUST_BGD);
-
 	_rect.x = _rect.x > 0 ? _rect.x : 0;
 	_rect.y = _rect.y > 0 ? _rect.y : 0;
 	_rect.width = _rect.x + _rect.width > _imgSize.width ? _imgSize.width - _rect.x : _rect.width;
 	_rect.height = _rect.y + _rect.height > _imgSize.height ? _imgSize.height - _rect.y : _rect.height;
-
-	//(_mask(_rect)).setTo(MAYBE_FGD);
 	(_mask(_rect)).setTo(Scalar(MAYBE_FGD));
 }
 //利用 kmeans 方法初始化 GMM 模型
@@ -92,10 +89,8 @@ static void initGMMs(const Mat& img, const Mat& mask, GMM& bgdGMM, GMM& fgdGMM) 
 	Mat bgdLabels, fgdLabels;
 	vector<Vec3f> bgdSamples, fgdSamples;
 	Point p;
-	for (p.y = 0; p.y < img.rows; p.y++)
-	{
-		for (p.x = 0; p.x < img.cols; p.x++)
-		{
+	for (p.y = 0; p.y < img.rows; p.y++){
+		for (p.x = 0; p.x < img.cols; p.x++){
 			if (mask.at<uchar>(p) == MUST_BGD || mask.at<uchar>(p) == MAYBE_BGD)
 				bgdSamples.push_back((Vec3f)img.at<Vec3b>(p));
 			else
